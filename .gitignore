@@ -1,3 +1,8 @@
+/firmware
+/tools
+/gcc-arm-linux-gnueabihf
+/.idea
+
 /target
 **/*.rs.bk
 /.vscode
