@@ -1,3 +1,5 @@
+pub mod blackborder;
+
 use image::{self, imageops};
 use std::collections::HashMap;
 

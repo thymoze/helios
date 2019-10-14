@@ -1,25 +1,32 @@
 mod capture;
-mod blackborder;
 mod imageprocessing;
+mod device;
 
-use linux_embedded_hal as linux_hal;
+#[cfg(target_os = "linux")]
+use {
+    linux_embedded_hal as linux_hal,
+    smart_leds::SmartLedsWrite,
+    smart_leds::colors,
 
-use smart_leds::SmartLedsWrite;
-use smart_leds::colors;
-use apa102_spi::Apa102;
+    device::Apa102,
+};
 
+#[cfg(feature = "rpi")]
 use crate::capture::dispmanx;
-use crate::imageprocessing::LedMap;
-use crate::blackborder::{Bounds, bounding_box};
-use image::{ImageBuffer, RgbImage};
 
+use crate::imageprocessing::{
+    LedMap,
+    blackborder::{Bounds, bounding_box},
+};
+use image::{ImageBuffer, RgbImage};
+use crate::device::Device;
+
+#[cfg(unix)]
 fn main() {
-    let mut spi = linux_hal::Spidev::open("/dev/spidev0.0").unwrap();
     let mut spi_options = linux_hal::spidev::SpidevOptions::new();
     spi_options.max_speed_hz(4_000_000);
-    spi.configure(&spi_options);
+    let mut apa = Apa102::init("/dev/spidev0.0", spi_options).unwrap();
 
-    let mut apa = Apa102::new(spi);
     let mut map = LedMap::init(26, 14, 46, Some(14), Some(46), true);
     let mut bounds = Bounds {
         x: 0,
@@ -50,4 +57,9 @@ fn main() {
     let color = colors::BLACK;
     let slice = vec![color; 128];
     apa.write(slice.into_iter());
+}
+
+#[cfg(windows)]
+fn main() {
+    println!("Windows currently not ready.");
 }

@@ -5,13 +5,20 @@ authors = ["David Heim <david@thymoze.me>"]
 edition = "2018"
 build = "build.rs"
 
+[features]
+rpi = [ "videocore" ]
+
 [dependencies]
-linux-embedded-hal = "0.2"
 image = "0.22.3"
 num-traits = "0.2.8"
-videocore = { git = "https://github.com/thymoze/rust-videocore" }
+
+[target.'cfg(unix)'.dependencies]
+linux-embedded-hal = "0.2"
 
 # Leds
 smart-leds = "0.3"
 apa102-spi = "0.3"
 ws2812-spi = "0.2"
+
+# Capture
+videocore = { git = "https://github.com/thymoze/rust-videocore", optional = true }
