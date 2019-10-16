@@ -16,19 +16,23 @@ pub struct LedMap {
 }
 
 impl LedMap {
-    pub fn init(w: u32, h: u32, 
-            start: u32, 
-            skip: Option<u32>, skip_offset: Option<u32>, 
-            reverse: bool) -> LedMap {
+    pub fn init(
+        w: u32,
+        h: u32,
+        start: u32,
+        skip: Option<u32>,
+        skip_offset: Option<u32>,
+        reverse: bool,
+    ) -> LedMap {
         LedMap {
             width: w,
             height: h,
-            size: 2*w + 2*h,
+            size: 2 * w + 2 * h,
             start_offset: start,
             skip: skip.unwrap_or(0),
             skip_offset: skip_offset.unwrap_or(0),
             reverse: reverse,
-            map: HashMap::with_capacity((2*w + 2*h) as usize),
+            map: HashMap::with_capacity((2 * w + 2 * h) as usize),
         }
     }
 
@@ -47,7 +51,7 @@ impl LedMap {
                 }
                 continue;
             }
-            
+
             if self.skip_offset + self.skip > self.size {
                 if i >= self.skip_offset || i < (self.skip_offset + self.skip) % self.size {
                     self.map.insert(i, None);
@@ -59,7 +63,7 @@ impl LedMap {
                     continue;
                 }
             }
-            
+
             let mut x;
             let mut y;
             if i < self.width {
@@ -79,7 +83,7 @@ impl LedMap {
             self.map.insert(i, Some((x, y)));
             res.push(img.get_pixel(x, y).clone());
         }
-        
+
         if self.reverse {
             res.reverse();
         }

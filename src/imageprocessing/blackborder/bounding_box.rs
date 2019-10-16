@@ -1,6 +1,6 @@
+use crate::imageprocessing::blackborder::Bounds;
 use image::*;
 use num_traits::NumCast;
-use crate::blackborder::Bounds;
 
 pub fn trim(mut img: RgbImage, rect: &Bounds) -> RgbImage {
     imageops::crop(&mut img, rect.x, rect.y, rect.width, rect.height).to_image()
@@ -73,7 +73,7 @@ fn fuzzy_match<P: Pixel>(p1: &P, p2: &P) -> bool {
     let mut fuzz = 5f32;
     fuzz *= fuzz;
     fuzz *= 3f32;
-    
+
     let p1 = p1.to_rgb();
     let p2 = p2.to_rgb();
 

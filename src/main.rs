@@ -1,29 +1,23 @@
 mod capture;
-mod imageprocessing;
 mod device;
+mod imageprocessing;
 
-#[cfg(target_os = "linux")]
-use {
-    linux_embedded_hal as linux_hal,
-    smart_leds::SmartLedsWrite,
-    smart_leds::colors,
-
-    device::Apa102,
-};
+#[cfg(unix)]
+use {device::apa102::Apa102, linux_embedded_hal::spidev};
 
 #[cfg(feature = "rpi")]
 use crate::capture::dispmanx;
 
+use crate::device::Device;
 use crate::imageprocessing::{
+    blackborder::{bounding_box, Bounds},
     LedMap,
-    blackborder::{Bounds, bounding_box},
 };
 use image::{ImageBuffer, RgbImage};
-use crate::device::Device;
 
 #[cfg(unix)]
 fn main() {
-    let mut spi_options = linux_hal::spidev::SpidevOptions::new();
+    let mut spi_options = spidev::SpidevOptions::new();
     spi_options.max_speed_hz(4_000_000);
     let mut apa = Apa102::init("/dev/spidev0.0", spi_options).unwrap();
 
@@ -37,7 +31,6 @@ fn main() {
     let mut counter = 0u32;
 
     loop {
-        break;
         let img = dispmanx::capture();
 
         if counter % 30 == 0 {
@@ -48,15 +41,13 @@ fn main() {
 
         let img = bounding_box::trim(img, &bounds);
 
-        //println!("{:?}", img);
-        apa.write(map.map(img).iter().map(|rgb| rgb.0));
+        apa.write(&map.map(img));
 
         counter += 1;
     }
 
-    let color = colors::BLACK;
-    let slice = vec![color; 128];
-    apa.write(slice.into_iter());
+    let slice = vec![image::Rgb([0u8; 3]); 128];
+    apa.write(&slice);
 }
 
 #[cfg(windows)]
