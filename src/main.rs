@@ -9,13 +9,11 @@ use {device::apa102::Apa102, linux_embedded_hal::spidev};
 use crate::capture::dispmanx;
 
 use crate::device::Device;
-use crate::imageprocessing::{
-    blackborder::{bounding_box, Bounds},
-    LedMap,
-};
-use image::{ImageBuffer, RgbImage};
+use crate::imageprocessing::{blackborder::{bounding_box, Bounds}, LedMap, smoothing};
+use image::Rgb;
+use std::{thread, time::Instant, time::Duration};
 
-#[cfg(unix)]
+#[cfg(all(unix, feature = "rpi"))]
 fn main() {
     let mut spi_options = spidev::SpidevOptions::new();
     spi_options.max_speed_hz(4_000_000);
@@ -30,24 +28,31 @@ fn main() {
     };
     let mut counter = 0u32;
 
+    let mut last_write = Instant::now();
+    let mut leds = vec![Rgb([0; 3]); 128];
+
     loop {
         let img = dispmanx::capture();
 
-        if counter % 30 == 0 {
+        if counter % 500 == 0 {
             if let Some(b) = bounding_box::bounding_box(&img) {
                 bounds = b;
             }
         }
 
         let img = bounding_box::trim(img, &bounds);
+        let mapped = map.map(img);
 
-        apa.write(&map.map(img));
+        let factor = (Instant::now() - last_write).as_secs_f32() / 0.2;
+        leds = smoothing::linear_smoothing(&leds, &mapped, factor);
 
-        counter += 1;
+        apa.write(&leds).unwrap();
+        last_write = Instant::now();
+
+        counter = counter.wrapping_add(1);
+
+        thread::sleep(Duration::from_millis(33));
     }
-
-    let slice = vec![image::Rgb([0u8; 3]); 128];
-    apa.write(&slice);
 }
 
 #[cfg(windows)]

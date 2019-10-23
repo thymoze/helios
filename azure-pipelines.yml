@@ -1,5 +1,8 @@
-stages:
-  - template: azure/stages.yml@templates
+steps:
+  - template: azure/install-rust.yml@templates
+  - script: git clone --depth 1 https://github.com/raspberrypi/firmware.git
+  - script: cargo install cross
+  - script: cross build --target armv7-unknown-linux-gnueabihf --features "rpi" --release
 
 resources:
   repositories:

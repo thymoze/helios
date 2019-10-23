@@ -1,4 +1,5 @@
 pub mod blackborder;
+pub mod smoothing;
 
 use image::{self, imageops};
 use std::collections::HashMap;
@@ -31,13 +32,13 @@ impl LedMap {
             start_offset: start,
             skip: skip.unwrap_or(0),
             skip_offset: skip_offset.unwrap_or(0),
-            reverse: reverse,
+            reverse,
             map: HashMap::with_capacity((2 * w + 2 * h) as usize),
         }
     }
 
     pub fn map(&mut self, img: image::RgbImage) -> Vec<image::Rgb<u8>> {
-        let img = imageops::resize(&img, self.width, self.height, image::FilterType::Nearest);
+        let img = imageops::resize(&img, self.width, self.height, image::FilterType::Gaussian);
 
         let mut res = Vec::with_capacity(self.size as usize);
 
@@ -57,15 +58,13 @@ impl LedMap {
                     self.map.insert(i, None);
                     continue;
                 }
-            } else {
-                if i >= self.skip_offset && i < (self.skip_offset + self.skip) {
-                    self.map.insert(i, None);
-                    continue;
-                }
+            } else if i >= self.skip_offset && i < (self.skip_offset + self.skip) {
+                self.map.insert(i, None);
+                continue;
             }
 
-            let mut x;
-            let mut y;
+            let x;
+            let y;
             if i < self.width {
                 x = i;
                 y = 0;

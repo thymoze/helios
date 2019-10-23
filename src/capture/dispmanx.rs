@@ -23,7 +23,6 @@ pub fn capture() -> image::RgbImage {
         bcm_host::deinit();
         panic!("Unable to get display information");
     }
-    let info = unsafe { info.assume_init() };
 
     let mut rect = MaybeUninit::<Rect>::uninit();
     let result = dispmanx::rect_set(rect.as_mut_ptr(), 0, 0, 256, 144);

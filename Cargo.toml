@@ -9,8 +9,6 @@ build = "build.rs"
 rpi = [ "videocore" ]
 
 [dependencies]
-#captrs = "0.2.2"
-
 image = "0.22.3"
 num-traits = "0.2.8"
 
