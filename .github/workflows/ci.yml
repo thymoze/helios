@@ -1,0 +1,74 @@
+name: Rust
+on: [push, pull_request]
+
+jobs:
+  native:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        build: [ linux, windows ]
+        include:
+          - build: linux
+            os: ubuntu-18.04
+          - build: windows
+            os: windows-2019
+          #- build: macos
+          #  os: macOS-10.14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --verbose
+
+      - name: Release build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
+  rpi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: Get rpi firmware dependencies
+        run: git clone --depth 1 https://github.com/raspberrypi/firmware.git
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: test
+          args: --verbose --target armv7-unknown-linux-gnueabihf
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target armv7-unknown-linux-gnueabihf --features "rpi"

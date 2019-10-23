@@ -13,7 +13,7 @@ use crate::imageprocessing::{blackborder::{bounding_box, Bounds}, LedMap, smooth
 use image::Rgb;
 use std::{thread, time::Instant, time::Duration};
 
-#[cfg(all(unix, feature = "rpi"))]
+#[cfg(feature = "rpi")]
 fn main() {
     let mut spi_options = spidev::SpidevOptions::new();
     spi_options.max_speed_hz(4_000_000);
@@ -55,7 +55,6 @@ fn main() {
     }
 }
 
-#[cfg(windows)]
+#[cfg(not(feature = "rpi"))]
 fn main() {
-    println!("Windows currently not ready.");
 }

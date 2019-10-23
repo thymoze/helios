@@ -6,8 +6,8 @@
 <br />
 <div align="center">
   <!-- Build status -->
-  <a href="https://dev.azure.com/thymoze/helios/_build/latest?definitionId=1&branchName=master">
-    <img alt="Azure DevOps builds" src="https://img.shields.io/azure-devops/build/thymoze/46fcba32-52e5-4342-8352-4847447a3261/1?style=flat-square">
+  <a href="https://actions-badge.atrox.dev/thymoze/helios/goto">
+    <img alt="Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fthymoze%2Fhelios%2Fbadge&style=flat-square"/>
   </a>
 </div>
 <br />
