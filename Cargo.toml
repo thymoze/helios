@@ -9,8 +9,10 @@ build = "build.rs"
 rpi = [ "videocore" ]
 
 [dependencies]
-image = "0.22.3"
-num-traits = "0.2.8"
+image = "0.22"
+num-traits = "0.2"
+rayon = "1.2"
+itertools = "0.8"
 
 [target.'cfg(unix)'.dependencies]
 linux-embedded-hal = "0.2"

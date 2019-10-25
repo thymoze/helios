@@ -1,6 +1,4 @@
 #[cfg(feature = "rpi")]
 pub mod dispmanx;
 
-pub trait Capturer {
-
-}
+pub trait Capturer {}

@@ -1,3 +1,5 @@
+//#![feature(test)]
+
 mod capture;
 mod device;
 mod imageprocessing;
@@ -9,9 +11,12 @@ use {device::apa102::Apa102, linux_embedded_hal::spidev};
 use crate::capture::dispmanx;
 
 use crate::device::Device;
-use crate::imageprocessing::{blackborder::{bounding_box, Bounds}, LedMap, smoothing};
+use crate::imageprocessing::{
+    blackborder::{bounding_box, Bounds},
+    smoothing, LedMap,
+};
 use image::Rgb;
-use std::{thread, time::Instant, time::Duration};
+use std::{thread, time::Duration, time::Instant};
 
 #[cfg(feature = "rpi")]
 fn main() {
@@ -41,7 +46,7 @@ fn main() {
         }
 
         let img = bounding_box::trim(img, &bounds);
-        let mapped = map.map(img);
+        let mapped = map.map_hash(&img);
 
         let factor = (Instant::now() - last_write).as_secs_f32() / 0.2;
         leds = smoothing::linear_smoothing(&leds, &mapped, factor);
@@ -56,5 +61,4 @@ fn main() {
 }
 
 #[cfg(not(feature = "rpi"))]
-fn main() {
-}
+fn main() {}
